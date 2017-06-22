@@ -12,7 +12,7 @@ jar/
 *.def
 *.obj
 *.bin
-libFOSSEE_GoogleOR_Toolbox_*.*
+libMinotaur_Toolbox_*.*
 macros/lib
 Makelib.mak
 master_help.xml
