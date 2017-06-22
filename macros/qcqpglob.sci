@@ -1,34 +1,101 @@
 function [kSoln, kSolnVector, status] = qcqpglob(varargin)
-	// Solves problem with Convex/Non-Convex Quadratically Constrained Quadratic Programming Problems with Global Optimization (GLOB)
+	//	Solves problem with Convex/Non-Convex Quadratically Constrained Quadratic Programming Problems with Global Optimization (GLOB)
+	//	
+	//	Calling Sequence
+	//	[kSoln, kSolnVector] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var);
+	//	[kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var);
+	//	[kSoln, kSolnVector] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
+	//	[kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
+	//	
+	//	Parameters
+	//	n : a double, represents number of Decision Variables
+	//	m : a double, represents number of Constraints
+	//	h_obj : a matrix of double, n x n, represents Coefficients of Quadratic in Objective Function
+	//	f_obj : a vector of double, sized n, represents Coefficients of Linear in Objective Function
+	//	c_obj : a double, represents Constant term in Objective Function
+	//	h_con : an m sized list, contains matrices of double, n x n, represents Coefficients of Quadratic in Constraints
+	//	f_con : an m sized list, contains vectors of double, sized n, represents Coefficients of Linear in Constraints
+	//	lb_con : a vector of double, sized m, represents Lower Bound of Constraints
+	//	ub_con : a vector of double, sized m, represents Upper Bound of Constraints
+	//	lb_var : a vector of double, sized n, represents Lower Bound of Decision Variables
+	//	ub_var : a vector of double, sized n, represents Upper Bound of Decision Variables
+	//	maxcputime : a double, represents max. cpu time allotted to BnB Solver
+	//	kSoln : a double, represents value of Objective Function at Optimal Point
+	//	kSolnVector : a vector of double, sized n, represents values of Decision Variables at Optimal Point
+	//	status : contains the exit flag of Solver. See below
+	//	
+	//	Description
+	//	Solves QCQP / Quadratically Constrained Quadratic Programming problems, especially those where local optimum is not the global optimum, i.e. when the problem is Non-Convex. Can solve Convex Problem as well.
+	//	
+	//	<latex>
+	//	</latex>
 	//
-	//   Calling Sequence
-	//   [kSoln, kSolnVector] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var);
-	//   [kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var);
-	//   [kSoln, kSolnVector] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
-	//   [kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
-	//   
-	//   Parameters
-	//   n : a double, represents number of Decision Variables
-	//   m : a double, represents number of Constraints
-	//   h_obj : a matrix of double, n x n, represents Coefficients of Quadratic in Objective Function
-	//   f_obj : a vector of double, sized n, represents Coefficients of Linear in Objective Function
-	//   c_obj : a double, represents Constant term in Objective Function
-	//   h_con : an m sized list, contains matrices of double, n x n, represents Coefficients of Quadratic in Constraints
-	//   f_con : an m sized list, contains vectors of double, sized n, represents Coefficients of Linear in Constraints
-	//   lb_con : a vector of double, sized m, represents Lower Bound of Constraints
-	//   ub_con : a vector of double, sized m, represents Upper Bound of Constraints
-	//   lb_var : a vector of double, sized n, represents Lower Bound of Decision Variables
-	//   ub_var : a vector of double, sized n, represents Upper Bound of Decision Variables
-	//   maxcputime : a double, represents max. cpu time allotted to BnB Solver
-	//   kSoln : a double, represents value of Objective Function at Optimal Point
-	//   kSolnVector : a vector of double, sized n, represents values of Decision Variables at Optimal Point
-	//   status : contains the exit flag of Solver. See below
-	//   
-	//   Description
-	//   Solves problem with Convex/Non-Convex Quadratically Constrained Quadratic Programming Problems with Global Optimization (GLOB)
-	//   
-	//   Author
-	//   Souvik Das
+	//	<itemizedlist>
+	//		<listitem>status=0 : Not started solving</listitem>
+	//		<listitem>status=1 : Started solving</listitem>
+	//		<listitem>status=2 : Restarted solving</listitem>
+	//		<listitem>status=3 : Optimal solution found</listitem>
+	//		<listitem>status=4 : Detected infeasibility</listitem>
+	//		<listitem>status=5 : Detected unboundedness of relaxation</listitem>
+	//		<listitem>status=6 : Reached limit on gap</listitem>
+	//		<listitem>status=7 : Reached limit on number of solutions</listitem>
+	//		<listitem>status=8 : Reached iteration limit</listitem>
+	//		<listitem>status=9 : Interrupted</listitem>
+	//		<listitem>status=10 : Reached time limit</listitem>
+	//		<listitem>status=11 : Reached the limit on number of solutions</listitem>
+	//		<listitem>status=12 : Finished for some other reason</listitem>
+	//	</itemizedlist>
+	//
+	//	The routine uses Minotaur Library for solving the quadratic problem, Minotaur is a library written in C++.
+	//
+	//	Examples
+	//	// Sample Only
+	//	n = 5;
+	//	m = 3;
+	//	h_obj = [
+	//	0, 0, 0, 1, -1;
+	//	0, 0, 0, 0, 0;
+	//	0, 0, 0, 0, 0;
+	//	0, 0, 0, 0, 0;
+	//	-1, 0, 0, 0, 0
+	//	];
+	//	f_obj = [	0, 1, 0, 0, 0	];
+	//	c_obj = 2;
+	//	h_con = list();
+	//	h_con(1) = [
+	//	2, 0, 0, 0, 0;
+	//	0, 2, 0, 0, 0;
+	//	0, 0, 2, 0 ,0;
+	//	0, 0, 0, 0, 0;
+	//	0, 0, 0, 0, 0
+	//	];
+	//	h_con(2) = [
+	//	-2, 0, 0, 0, 0;
+	//	0, 0, 0, 0, 0;
+	//	0, 0, 0, 0 ,0;
+	//	0, 0, 0, 0, 0;
+	//	0, 0, 0, 0, 0
+	//	];
+	//	h_con(3) = [
+	//	0, 0, 0, 0, 0;
+	//	0, 0, -1, 0, 0;
+	//	0, 0, 0, 0 ,0;
+	//	0, 0, 0, 0, 0;
+	//	0, 0, 0, 0, 0
+	//	];
+	//	f_con = list();
+	//	f_con(1) = [	0, 0, 0, 0, 0	];
+	//	f_con(2) = [	0, 0, 0, 1, 0	];
+	//	f_con(3) = [	0, 0, 0, 0, 1	];
+	//	lb_con = [	1, 0, 0	];
+	//	ub_con = [	1, 0, 0	];
+	//	maxcputime = 600;
+	//	lb_var = [	-%inf, -%inf, -%inf, -%inf, -%inf	];
+	//	ub_var = [	+%inf, +%inf, +%inf, +%inf, +%inf	];
+	//	[kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
+	//
+	//	Authors
+	//	Souvik Das
 	
 	// Validate Input & Output Arguments
 	[lhs, rhs] = argn();
