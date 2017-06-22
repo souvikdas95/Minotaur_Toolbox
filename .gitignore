@@ -1,0 +1,25 @@
+#
+# Generated files
+#
+loader.sce
+unloader.sce
+cleaner.sce
+loader_gateway.sce
+cleaner_gateway.sce
+jar/
+*.dll
+*.so
+*.def
+*.obj
+*.bin
+libFOSSEE_GoogleOR_Toolbox_*.*
+macros/lib
+Makelib.mak
+master_help.xml
+scilab_*_help
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vfproj
+locales/en_US/
+locales/fr_FR/

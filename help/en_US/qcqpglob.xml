@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * This help file was generated from qcqpglob.sci using help_from_sci().
+ *
+ -->
+
+<refentry version="5.0-subset Scilab" xml:id="qcqpglob" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:scilab="http://www.scilab.org"
+          xmlns:db="http://docbook.org/ns/docbook">
+
+  <refnamediv>
+    <refname>qcqpglob</refname>
+    <refpurpose>Solves problem with Convex/Non-Convex Quadratically Constrained Quadratic Programming Problems with Global Optimization (GLOB)</refpurpose>
+  </refnamediv>
+
+
+<refsynopsisdiv>
+   <title>Calling Sequence</title>
+   <synopsis>
+   [kSoln, kSolnVector] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var);
+   [kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var);
+   [kSoln, kSolnVector] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
+   [kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
+   
+   </synopsis>
+</refsynopsisdiv>
+
+<refsection>
+   <title>Parameters</title>
+   <variablelist>
+   <varlistentry><term>n :</term>
+      <listitem><para> a double, represents number of Decision Variables</para></listitem></varlistentry>
+   <varlistentry><term>m :</term>
+      <listitem><para> a double, represents number of Constraints</para></listitem></varlistentry>
+   <varlistentry><term>h_obj :</term>
+      <listitem><para> a matrix of double, n x n, represents Coefficients of Quadratic in Objective Function</para></listitem></varlistentry>
+   <varlistentry><term>f_obj :</term>
+      <listitem><para> a vector of double, sized n, represents Coefficients of Linear in Objective Function</para></listitem></varlistentry>
+   <varlistentry><term>c_obj :</term>
+      <listitem><para> a double, represents Constant term in Objective Function</para></listitem></varlistentry>
+   <varlistentry><term>h_con :</term>
+      <listitem><para> an m sized list, contains matrices of double, n x n, represents Coefficients of Quadratic in Constraints</para></listitem></varlistentry>
+   <varlistentry><term>f_con :</term>
+      <listitem><para> an m sized list, contains vectors of double, sized n, represents Coefficients of Linear in Constraints</para></listitem></varlistentry>
+   <varlistentry><term>lb_con :</term>
+      <listitem><para> a vector of double, sized m, represents Lower Bound of Constraints</para></listitem></varlistentry>
+   <varlistentry><term>ub_con :</term>
+      <listitem><para> a vector of double, sized m, represents Upper Bound of Constraints</para></listitem></varlistentry>
+   <varlistentry><term>lb_var :</term>
+      <listitem><para> a vector of double, sized n, represents Lower Bound of Decision Variables</para></listitem></varlistentry>
+   <varlistentry><term>ub_var :</term>
+      <listitem><para> a vector of double, sized n, represents Upper Bound of Decision Variables</para></listitem></varlistentry>
+   <varlistentry><term>maxcputime :</term>
+      <listitem><para> a double, represents max. cpu time allotted to BnB Solver</para></listitem></varlistentry>
+   <varlistentry><term>kSoln :</term>
+      <listitem><para> a double, represents value of Objective Function at Optimal Point</para></listitem></varlistentry>
+   <varlistentry><term>kSolnVector :</term>
+      <listitem><para> a vector of double, sized n, represents values of Decision Variables at Optimal Point</para></listitem></varlistentry>
+   <varlistentry><term>status :</term>
+      <listitem><para> contains the exit flag of Solver. See below</para></listitem></varlistentry>
+   </variablelist>
+</refsection>
+
+<refsection>
+   <title>Description</title>
+   <para>
+Solves problem with Convex/Non-Convex Quadratically Constrained Quadratic Programming Problems with Global Optimization (GLOB)
+   </para>
+   <para>
+Author
+Souvik Das
+</para>
+</refsection>
+</refentry>
