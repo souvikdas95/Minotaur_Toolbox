@@ -17,19 +17,19 @@ function quitModule()
     root_tlbx = strncpy( etc_tlbx, length(etc_tlbx) - 5 );  // length("\etc\") = 5
 
     // Unlink Libraries
-    [bOK, ilib] = c_link("lib" + TOOLBOX_TITLE + "_cpp");
+    [bOK, ilib] = c_link("lib" + TOOLBOX_NAME + "_cpp");
     if bOK then
         ulink(ilib);
     end
-    [bOK, ilib] = c_link("lib" + TOOLBOX_TITLE + "_c");
+    [bOK, ilib] = c_link("lib" + TOOLBOX_NAME + "_c");
     if bOK then
         ulink(ilib);
     end
-    [bOK, ilib] = c_link("lib" + TOOLBOX_TITLE + "_java");
+    [bOK, ilib] = c_link("lib" + TOOLBOX_NAME + "_java");
     if bOK then
         ulink(ilib);
     end
-    [bOK, ilib] = c_link("lib" + TOOLBOX_TITLE + "_fortran");
+    [bOK, ilib] = c_link("lib" + TOOLBOX_NAME + "_fortran");
     if bOK then
         ulink(ilib);
     end
