@@ -58,7 +58,7 @@ extern "C"{
 	#include <Scierror.h>
 	#include <sciprint.h>
 	
-	int sci_qcqpglob(const char* fname, unsigned long fname_len);
+	int sci_qcqpglob(const char* fname, unsigned long fname_len);	// Main
 }
 
 #include "sci_iofunc.hpp"
@@ -66,6 +66,15 @@ extern "C"{
 
 using namespace Minotaur;
 
+// Declarations
+int Transform(EnvPtr env, ProblemPtr p_orig, ProblemPtr &p_new, HandlerVector &handlers);
+PresolverPtr CreatePresolver(ProblemPtr p, EnvPtr env, HandlerVector &handlers, size_t numVars = 0);
+BranchAndBound* CreateBranchAndBound(EnvPtr env, ProblemPtr p, EnginePtr e, HandlerVector &handlers);
+double* GetSolution(PresolverPtr pres, SolutionPtr sol, int n);
+void GLOB_addObjective(ProblemPtr& p, double* H, double* f, double c);
+void GLOB_addConstraint(ProblemPtr& p, double* H, double* f, double lb, double ub);
+
+// Definitions
 int Transform(EnvPtr env, ProblemPtr p_orig, ProblemPtr &p_new, HandlerVector &handlers) 
 {
 	// Init Vars
@@ -194,14 +203,23 @@ BranchAndBound* CreateBranchAndBound(EnvPtr env, ProblemPtr p, EnginePtr e, Hand
 	return bab;
 }
 
-const double* GetSolution(PresolverPtr pres, SolutionPtr sol)
+double* GetSolution(PresolverPtr pres, SolutionPtr sol, int n)
 {
+	const double* exSoln = NULL;
+	double* ret = NULL;
+	UInt i;
+
 	if (sol != SolutionPtr())
 	{
 		sol = pres->getPostSol(sol);
 		if (sol != SolutionPtr())
 		{
-			return sol->getPrimal();
+			exSoln = sol->getPrimal();
+			ret = (double*)malloc(sizeof(double) * n);
+			for(i = 0; i < n; ++i)
+				ret[i] = exSoln[i];
+
+			return ret;
 		}
 	}
 	return NULL;
@@ -334,11 +352,11 @@ int sci_qcqpglob(const char* fname, unsigned long fname_len)
 	{
 		return 1;
 	}
-	if(getFixedSizeDoubleMatrixFromScilab(8, 1, m, &lb_con))
+	if(getFixedSizeDoubleMatrixFromScilab(8, m ? 1 : 0, m, &lb_con))
 	{
 		return 1;
 	}
-	if(getFixedSizeDoubleMatrixFromScilab(9, 1, m, &ub_con))
+	if(getFixedSizeDoubleMatrixFromScilab(9, m ? 1 : 0, m, &ub_con))
 	{
 		return 1;
 	}
@@ -441,8 +459,9 @@ int sci_qcqpglob(const char* fname, unsigned long fname_len)
 	bab->solve();
 
 	// Get Solution
-	kSolnVector = (double*)GetSolution(pres_orig, bab->getSolution());
+	kSolnVector = GetSolution(pres_orig, bab->getSolution(), n);
 	kSoln = bab->getUb();
+	kSoln += c_obj;	// Problem with Library?
 	status = bab->getStatus();
 	
 	// Clean
