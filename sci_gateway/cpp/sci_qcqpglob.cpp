@@ -1,6 +1,6 @@
-//	Glob QCQP Minotaur Scilab Interface Gateway
+// Glob QCQP Minotaur Scilab Interface Gateway
 //
-// qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_bar);
+// qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_bar, maxcputime);
 //
 // n -> no. of variables
 // m -> no. of constraints
@@ -13,6 +13,7 @@
 // ub_con -> m x 1 matrix or m-column-vector
 // lb_var -> n x 1 matrix or n-column-vector
 // ub_var -> n x 1 matrix or n-column-vector
+// maxcputime -> timeout in seconds for solving
 //
 //
 #include <cmath>
@@ -229,7 +230,8 @@ void GLOB_addObjective(ProblemPtr& p, double* H, double* f, double c)
 {
 	VariableConstIterator vbeg = p->varsBegin();
 	VariableConstIterator vend = p->varsEnd();
-	CGraphPtr cg;
+	CGraphPtr cg = CGraphPtr();	// NULL
+	FunctionPtr fun = FunctionPtr(); // NULL
 
 	QuadraticFunctionPtr qf = (QuadraticFunctionPtr) new QuadraticFunction(H, vbeg, vend);
 	LinearFunctionPtr lf = (LinearFunctionPtr) new LinearFunction(f, vbeg, vend, 1e-9);
@@ -240,10 +242,17 @@ void GLOB_addObjective(ProblemPtr& p, double* H, double* f, double c)
 		return;
 	}
 	
-	cg = (CGraphPtr) new CGraph(qf, lf);
-	cg->finalize();
+	if(qf->getNumTerms() == 0)
+	{
+		fun = (FunctionPtr) new Function(lf);
+	}
+	else
+	{
+		cg = (CGraphPtr) new CGraph(qf, lf);
+		cg->finalize();
+		fun = (FunctionPtr) new Function(cg);
+	}
 
-	FunctionPtr fun = (FunctionPtr) new Function(cg);
 	p->newObjective(fun, c, Minimize);
 }
 
@@ -251,7 +260,8 @@ void GLOB_addConstraint(ProblemPtr& p, double* H, double* f, double lb, double u
 {
 	VariableConstIterator vbeg = p->varsBegin();
 	VariableConstIterator vend = p->varsEnd();
-	CGraphPtr cg;
+	CGraphPtr cg = CGraphPtr(); // NULL
+	FunctionPtr fun = FunctionPtr(); // NULL
 
 	QuadraticFunctionPtr qf = (QuadraticFunctionPtr) new QuadraticFunction(H, vbeg, vend);
 	LinearFunctionPtr lf = (LinearFunctionPtr) new LinearFunction(f, vbeg, vend, 1e-9);
@@ -262,10 +272,17 @@ void GLOB_addConstraint(ProblemPtr& p, double* H, double* f, double lb, double u
 		return;
 	}
 	
-	cg = (CGraphPtr) new CGraph(qf, lf);
-	cg->finalize();
+	if(qf->getNumTerms() == 0)
+	{
+		fun = (FunctionPtr) new Function(lf);
+	}
+	else
+	{
+		cg = (CGraphPtr) new CGraph(qf, lf);
+		cg->finalize();
+		fun = (FunctionPtr) new Function(cg);
+	}
 
-	FunctionPtr fun = (FunctionPtr) new Function(cg);
 	p->newConstraint(fun, lb, ub);
 }
 
@@ -410,7 +427,8 @@ int sci_qcqpglob(const char* fname, unsigned long fname_len)
 	// Add Variables
 	for(i = 0; i < n; ++i)
 	{
-		orig_v.push_back(p_orig->newVariable(lb_var[i], ub_var[i], Integer));
+		// Library Limits. Need Warning?
+		orig_v.push_back(p_orig->newVariable(std::max(lb_var[i], -1e6), std::min(ub_var[i], 1e6), Integer));
 	}
 
 	// Add Objective
