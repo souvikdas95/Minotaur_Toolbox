@@ -75,12 +75,19 @@ Solves QCQP / Quadratically Constrained Quadratic Programming problems, especial
    </para>
    <para>
 <latex>
+\text{}\\
 \begin{align}
 &amp; \text{minimize} &amp;&amp; \tfrac12 x^\mathrm{T} H_0 x + f_0^\mathrm{T} x + c \\
 &amp; \text{subject to} &amp;&amp; {LB}_i \leq \tfrac12 x^\mathrm{T} H_i x + f_i^\mathrm{T} x \leq {UB}_i \quad \text{for } i = 1,\dots,m \\
 &amp;&amp;&amp; Ax = b
 \end{align}\\
+\text{}\\
+\text{}\\
+\text{}\\
 </latex>
+   </para>
+   <para>
+The status allows to know the status of the optimization which is given back by MINOTAUR.
    </para>
    <para>
 <itemizedlist>

@@ -26,15 +26,21 @@ function [kSoln, kSolnVector, status] = qcqpglob(varargin)
 	//	
 	//	Description
 	//	Solves QCQP / Quadratically Constrained Quadratic Programming problems, especially those where local optimum is not the global optimum, i.e. when the problem is Non-Convex. Can solve Convex Problem as well.
-	//	
+	//
 	//	<latex>
+	//		\text{}\\
 	//		\begin{align}
 	//		& \text{minimize} && \tfrac12 x^\mathrm{T} H_0 x + f_0^\mathrm{T} x + c \\
 	//		& \text{subject to} && {LB}_i \leq \tfrac12 x^\mathrm{T} H_i x + f_i^\mathrm{T} x \leq {UB}_i \quad \text{for } i = 1,\dots,m \\
 	//		&&& Ax = b
 	//		\end{align}\\
+	//		\text{}\\
+	//		\text{}\\
+	//		\text{}\\
 	//	</latex>
 	//
+	//	The status allows to know the status of the optimization which is given back by MINOTAUR.
+	//	
 	//	<itemizedlist>
 	//		<listitem>status=0 : Not started solving</listitem>
 	//		<listitem>status=1 : Started solving</listitem>
