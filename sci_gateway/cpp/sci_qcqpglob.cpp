@@ -207,23 +207,28 @@ BranchAndBound* CreateBranchAndBound(EnvPtr env, ProblemPtr p, EnginePtr e, Hand
 double* GetSolution(PresolverPtr pres, SolutionPtr sol, int n)
 {
 	const double* exSoln = NULL;
-	double* ret = NULL;
+	double* ret = (double*)malloc(sizeof(double) * n);;
 	UInt i;
 
 	if (sol != SolutionPtr())
 	{
 		sol = pres->getPostSol(sol);
 		if (sol != SolutionPtr())
-		{
 			exSoln = sol->getPrimal();
-			ret = (double*)malloc(sizeof(double) * n);
-			for(i = 0; i < n; ++i)
-				ret[i] = exSoln[i];
-
-			return ret;
-		}
 	}
-	return NULL;
+
+	if(exSoln != NULL)
+	{
+		for(i = 0; i < n; ++i)
+			ret[i] = exSoln[i];
+	}
+	else	// Fail Safe
+	{
+		for(i = 0; i < n; ++i)
+			ret[i] = 0.0;
+	}
+
+	return ret;
 }
 
 void GLOB_addObjective(ProblemPtr& p, double* H, double* f, double c)
@@ -477,10 +482,10 @@ int sci_qcqpglob(const char* fname, unsigned long fname_len)
 	bab->solve();
 
 	// Get Solution
-	kSolnVector = GetSolution(pres_orig, bab->getSolution(), n);
-	kSoln = bab->getUb();
-	kSoln += c_obj;	// Problem with Library?
 	status = bab->getStatus();
+	kSoln = bab->getUb();
+	kSolnVector = GetSolution(pres_orig, bab->getSolution(), n);
+	kSoln += c_obj;	// Problem with Library?
 	
 	// Clean
 	delete bab;
