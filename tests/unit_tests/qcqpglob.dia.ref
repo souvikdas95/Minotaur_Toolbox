@@ -1,0 +1,80 @@
+// Copyright (C) 2017 - IIT Bombay - FOSSEE
+//
+// Author:	Souvik Das
+// Organization: FOSSEE, IIT Bombay
+// Email: harpreet.mertia@gmail.com
+//
+// This file must be used under the terms of the CeCILL.
+// This source file is licensed as described in the file COPYING, which
+// you should have received as part of this distribution.  The terms
+// are also available at
+// http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
+// <-- JVM NOT MANDATORY -->
+// <-- ENGLISH IMPOSED -->
+//
+// assert_close --
+//   Returns 1 if the two real matrices computed and expected are close,
+//   i.e. if the relative distance between computed and expected is lesser than epsilon.
+// Arguments
+//   computed, expected : the two matrices to compare
+//   epsilon : a small number
+//
+function flag = assert_close ( computed, expected, epsilon )
+  if expected==0.0 then
+    shift = norm(computed-expected);
+  else
+    shift = norm(computed-expected)/norm(expected);
+  end
+//  if shift < epsilon then
+//    flag = 1;
+//  else
+//    flag = 0;
+//  end
+//  if flag <> 1 then bugmes();quit;end
+    flag = assert_checktrue ( shift < epsilon );
+endfunction
+//
+// assert_equal --
+//   Returns 1 if the two real matrices computed and expected are equal.
+// Arguments
+//   computed, expected : the two matrices to compare
+//   epsilon : a small number
+//
+//function flag = assert_equal ( computed , expected )
+//  if computed==expected then
+//    flag = 1;
+//  else
+//    flag = 0;
+//  end
+//  if flag <> 1 then bugmes();quit;end
+//endfunction
+//    Sample Only
+//    Min. Z = 100 - x^2 + 2 * y^2 - 3 * x * y + 4 * x - 5 * y
+//    Subject to:
+//    60 >= x^2 + y^2 - x - y >= -100
+//    -10 <= x <= 6
+//    -10 <= y <= 6
+ 
+n = 2;
+m = 1;
+h_obj = [-2, -1; -2, 4];
+f_obj = [4, -5];
+c_obj = 100;
+h_con = list();
+h_con(1) = [2, 0; 0, 2];
+f_con = list();
+f_con(1) = [-1, -1];
+lb_con = [-100];
+ub_con = [60];
+maxcputime = 600;
+lb_var = [-10, -10];
+ub_var = [6, 6];
+[kSoln, kSolnVector, status] = qcqpglob(n, m, h_obj, f_obj, c_obj, h_con, f_con, lb_con, ub_con, lb_var, ub_var, maxcputime);
+
+Optimal Solution Found.
+assert_close(kSoln, 9, 0.1);
+assert_close(kSolnVector, [-7, -1], 0.15);
+assert_checkequal(status,[3]);
+printf("\nTest Successful!\n");
+
+Test Successful!
